@@ -35,6 +35,7 @@ import java.util.Iterator;
  */
 public class HelperClass {
     private static HelperClass uniqueInstance;
+    private Context tempContext;
 
     public static final String LOG_TAG = "RFStudio-Controller";
 
@@ -57,11 +58,23 @@ public class HelperClass {
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 
-    public void sendMessage(String message)
+    public void sendMessage(String message, Context context)
     {
+        tempContext = context;
         SendMessage asyncMessage = new SendMessage(message);
         asyncMessage.execute();
+    }
 
+    private void messageResponse(String response) {
+        if(response.startsWith("10001"))
+        {
+            Toast.makeText(tempContext, "Invalid Account Info", Toast.LENGTH_LONG).show();
+        } else if(response.startsWith("10002"))
+        {
+            Toast.makeText(tempContext, "Invalid Message Format", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(tempContext, response,Toast.LENGTH_LONG).show();
+        }
     }
 
     private class SendMessage extends AsyncTask<Void, Void, Void> {
@@ -82,7 +95,6 @@ public class HelperClass {
                 PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
                 out.println(accountDetails+message);
-
 
                 ByteArrayOutputStream byteArrayOutputStream =
                         new ByteArrayOutputStream(1024);
@@ -115,7 +127,8 @@ public class HelperClass {
         @Override
         protected void onPostExecute(Void result) {
             //textResponse.setText(response);
-            Log.d(LOG_TAG, response);
+            //Log.d(LOG_TAG, response);
+            messageResponse(response);
             super.onPostExecute(result);
         }
 

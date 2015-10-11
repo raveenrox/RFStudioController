@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
     public void mainActBtn(View view) {
         switch (view.getId()){
             case R.id.btnSend:
-                helperClass.sendMessage(etMessage.getText().toString());
+                helperClass.sendMessage(etMessage.getText().toString(), this);
                 break;
         }
     }
